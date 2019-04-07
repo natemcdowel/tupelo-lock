@@ -1,0 +1,13 @@
+
+Commands:
+
+node tupelo-client.js register wallet_name wallet_password
+node tupelo-client.js stamp wallet_name wallet_password -n "stamp 1"
+node tupelo-client.js tally wallet_name wallet_password
+
+Flow:
+
+1. Admin grants one hour token to wallet_name.
+2. User of wallet_name spends token and has access to lock for one hour,
+3. User tries to lock / unlock and Tupelo checks the initial timestamp to see if within one hour. Access granted.
+4. User tries to lock / unlock and Tupelo no longer gives access due to expired timestamp.
