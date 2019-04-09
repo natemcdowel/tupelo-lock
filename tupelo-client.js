@@ -30,7 +30,7 @@ const readIdentifierFile = () => {
   return JSON.parse(raw);
 };
 
-const TUPELO_HOST = '10.0.0.240:50051';
+const TUPELO_HOST = 'localhost:50051';
 const CHAIN_TREE_STAMP_PATH = 'timestamper/stamps';
 const STAMP_SEPARATOR = ',,';
 const NOTE_SEPARATOR = '-:';
