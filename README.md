@@ -2,7 +2,7 @@
 
 - Install Openzwave from https://github.com/OpenZWave/open-zwave/archive/master.zip. Run `sudo make && sudo make install && sudo ldconfig` to compile.
 - Uncomment the NetworkKey in the `options.xml` file of your openzwave installation.
-- `npm install`
+- Run `npm install`
 
 ## Setting up a Zwave device
 
