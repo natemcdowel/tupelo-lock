@@ -1,4 +1,3 @@
-// #! /usr/bin/env node
 const tupelo = require('tupelo-client');
 const fs = require('fs');
 const assert = require('assert');
@@ -41,17 +40,17 @@ class Tupelo {
   }
 
   connect(creds) {
-    return tupelo.connect(TUPELO_HOST, creds);
+    return tupelo.connect(this.TUPELO_HOST, creds);
   }
 
   async register(creds) {
-    const client = connect(creds);
+    const client = this.connect(creds);
 
     await client.register();
     const {keyAddr,} = await client.generateKey();
     const {chainId,} = await client.createChainTree(keyAddr);
-    const obj = identifierObj(keyAddr, chainId);
-    writeIdentifierFile(obj);
+    const obj = this.identifierObj(keyAddr, chainId);
+    this.writeIdentifierFile(obj);
   }
 
   async stamp(creds, notes) {

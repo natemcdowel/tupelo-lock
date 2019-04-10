@@ -12,7 +12,6 @@ class ZwaveLock {
     this.zwave = this.init();
     this.nodes = [];
     this.homeid = null;
-    this.zwave.connect();
   }
 
   init() {
