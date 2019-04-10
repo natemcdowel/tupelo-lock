@@ -2,7 +2,7 @@
 
 - Install Openzwave from https://github.com/OpenZWave/open-zwave/archive/master.zip. Run `sudo make && sudo make install && sudo ldconfig` to compile.
 - Uncomment the NetworkKey in the `options.xml` file of your openzwave installation.
-- `npm install`
+- Run `npm install`
 
 ## Setting up a Zwave device
 
@@ -16,4 +16,11 @@
 ## Running the server
 
 - Run Tupelo `docker run -p 50051:50051 quorumcontrol/tupelo:v0.1.1 rpc-server -l 3`
-- Run the Tupelo-zwave server `node server/server.js`
+- Run the Tupelo-Zwave server `node server/server.js`
+
+## Running the app
+
+- Run `cd app`
+- Run `npm install`
+- Run `npm start` to start the app.
+- Select Android or iPhone emulation mode
