@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require("body-parser");
 const Tupelo = require('./tupelo');
-const ZwaveLock = require('./zwave-lock');
+const ZwaveLock = require('./zwave');
 const creds = {
   walletName: 'wallet_name',
   passPhrase: 'wallet_password'
@@ -30,6 +30,17 @@ class TupeloServer {
   }
 
   handleRequests() {
+
+    this.app.get('/status', (req, res) => {
+
+      command = 'Status';
+      this.zwave.register(creds).then(
+        success => this.success(res, command),
+        error => this.error(res, command)
+      );
+
+    });
+
     this.app.get('/register', (req, res) => {
 
       command = 'Registration';
