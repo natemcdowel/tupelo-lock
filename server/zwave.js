@@ -2,7 +2,7 @@ const ZWave = require('openzwave-shared');
 const os = require('os');
 const zwavedriverpaths = {
   "darwin": '/dev/cu.usbmodem1411',
-  "linux": '/dev/ttyACM0',
+  "linux": '/dev/ttyAMA0',
   "windows": '\\\\.\\COM3'
 }
 
