@@ -6,7 +6,7 @@ import {
   Text,
   ActivityIndicator,
   View,
-  Button
+  TouchableOpacity
 } from 'react-native';
 import Endpoints from '../constants/Endpoints';
 
@@ -17,7 +17,7 @@ export default class HomeScreen extends React.Component {
 
   errorTimeout = 7000;
   state = {
-    locked: 'Unlock',
+    locked: false,
     loading: true,
     error: false
   };
@@ -72,9 +72,9 @@ export default class HomeScreen extends React.Component {
 
   _showButton = () => {
     return <View style={styles.mainContent}>
-      <Button 
-        onPress={this._toggleLock}
-        title={this.state.locked}/>
+    <TouchableOpacity onPress={this._toggleLock} style={styles.mainContentLink}>
+      <Text style={styles.mainContentLinkText}>{this.state.locked}</Text>
+    </TouchableOpacity>
     </View>
   }
 
@@ -104,7 +104,7 @@ export default class HomeScreen extends React.Component {
       .then(res => {
 
         this.setState({ locked: res.locked ? 'Unlock' : 'Lock' });
-        this.setState({ loading: false});
+        this.setState({ loading: false });
 
       }, () => {
 

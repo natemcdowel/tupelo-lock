@@ -1,10 +1,7 @@
 const ZWave = require('openzwave-shared');
 const os = require('os');
-const zwavedriverpaths = {
-  "darwin": '/dev/cu.usbmodem1411',
-  "linux": '/dev/ttyAMA0',
-  "windows": '\\\\.\\COM3'
-}
+const config = require('./config.json');
+const zwavedriverpaths = config.zwave_driver_paths;
 let nodes = [];
 
 class ZwaveLock {
@@ -18,7 +15,7 @@ class ZwaveLock {
   init() {
     return new ZWave({
       ConsoleOutput: false,
-      NetworkKey: '0x02,0x02,0x03,0x03,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,0x10'
+      NetworkKey: config.zwave_network_key
     });
   }
 

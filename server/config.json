@@ -1,0 +1,20 @@
+{
+  "tupelo_host": "localhost:50051",
+  "server_port": "3000",
+  "lockout_time": "3600",
+  "creds": {
+    "walletName": "wallet_name",
+    "passPhrase": "wallet_password"
+  },
+  "zwave_device": {
+    "nodeId": 3,
+    "class": 98,
+    "index": 0
+  },
+  "zwave_network_key": "0x02,0x02,0x03,0x03,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,0x10",
+  "zwave_driver_paths": {
+    "darwin": "/dev/cu.usbmodem1411",
+    "linux": "/dev/ttyAMA0",
+    "windows": "\\\\.\\COM3"
+  }
+}
