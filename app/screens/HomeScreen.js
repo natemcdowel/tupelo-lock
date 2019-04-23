@@ -4,7 +4,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   ActivityIndicator,
   View,
   Button
@@ -17,7 +16,6 @@ export default class HomeScreen extends React.Component {
   };
 
   errorTimeout = 7000;
-
   state = {
     locked: 'Unlock',
     loading: true,

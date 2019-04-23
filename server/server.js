@@ -2,17 +2,11 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const Tupelo = require('./tupelo');
 const ZwaveLock = require('./zwave');
-const lockoutTime = 3600;
-const port = 3000;
-const creds = {
-  walletName: 'wallet_name',
-  passPhrase: 'wallet_password'
-};
-const zwaveDevice = {
-  nodeId: 3,
-  class: 98,
-  index: 0
-}
+const config = require('./config.json');
+const lockoutTime = config.lockout_time;
+const port = config.server_port;
+const creds = config.creds;
+const zwaveDevice = config.zwave_device;
 
 class TupeloServer {
 
@@ -82,6 +76,7 @@ class TupeloServer {
       this.tupelo.stamp(creds).then(
 
         stamps => {
+          console.log(stamps);
           if (this.isFirstStamp(stamps) || this.stampIsValid(stamps)) {
             this.changeLock(res);
           } else {
@@ -89,7 +84,6 @@ class TupeloServer {
           }
         },
         error => {
-          console.log(error);
           this.error(res, {error: 'Could not change lock'});
         }
 

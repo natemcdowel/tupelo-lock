@@ -1,12 +1,13 @@
 const tupelo = require('tupelo-client');
 const fs = require('fs');
 const assert = require('assert');
+const config = require('./config.json');
 
 class Tupelo {
 
   constructor() {
     this.localIdentifierPath = './.timestamper-identifiers';
-    this.TUPELO_HOST = 'localhost:50051';
+    this.TUPELO_HOST = config.tupelo_host;
     this.CHAIN_TREE_STAMP_PATH = 'timestamper/stamps';
     this.STAMP_SEPARATOR = ',,';
     this.NOTE_SEPARATOR = '-:';
@@ -56,7 +57,7 @@ class Tupelo {
     this.writeIdentifierFile(obj);
   }
 
-  async stamp(creds, notes, threshold) {
+  async stamp(creds, notes) {
     if (!this.dataFileExists()) {
       console.error('Error: you must register before you can record stamps.');
       process.exit(1);
