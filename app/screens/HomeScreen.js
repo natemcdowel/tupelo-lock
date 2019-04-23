@@ -6,7 +6,8 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
-  View
+  View,
+  Button
 } from 'react-native';
 import Endpoints from '../constants/Endpoints';
 
@@ -15,9 +16,12 @@ export default class HomeScreen extends React.Component {
     header: null,
   };
 
+  errorTimeout = 7000;
+
   state = {
-    locked: 'unlocked',
-    loading: true
+    locked: 'Unlock',
+    loading: true,
+    error: false
   };
 
   constructor(props) {
@@ -54,6 +58,10 @@ export default class HomeScreen extends React.Component {
           <View style={styles.mainContent}>
             {mainContent}
           </View>
+
+          <View style={styles.errorContent}>
+            <Text style={styles.errorContentText}>{this.state.error}</Text>
+          </View>
         </ScrollView>
 
       </View>
@@ -66,16 +74,29 @@ export default class HomeScreen extends React.Component {
 
   _showButton = () => {
     return <View style={styles.mainContent}>
-      <TouchableOpacity onPress={this._toggleLock} style={styles.mainContentLink}>
-        <Text style={styles.mainContentLinkText}>{this.state.locked}</Text>
-      </TouchableOpacity>
+      <Button 
+        onPress={this._toggleLock}
+        title={this.state.locked}/>
     </View>
+  }
+
+  _setError = () => {
+    this.setState({ error: 'There was an error communicating with your lock'});
+    setTimeout(() => {
+      this.setState({ error: false});
+    }, this.errorTimeout);
   }
 
   _toggleLock = () => {
     this.setState({ loading: true});
     fetch(Endpoints.tupelo + '/stamp').then(data => {
+
       this._fetchLockStatus();
+
+    }, () => {
+      
+      this._setError();
+
     });
   };
 
@@ -83,8 +104,14 @@ export default class HomeScreen extends React.Component {
     fetch(Endpoints.tupelo + '/status')
       .then(res => res.json())
       .then(res => {
+
         this.setState({ locked: res.locked ? 'Unlock' : 'Lock' });
         this.setState({ loading: false});
+
+      }, () => {
+
+        this._setError();
+
       });
   }
 }
@@ -118,6 +145,14 @@ const styles = StyleSheet.create({
     color: 'rgba(96,100,109, 1)',
     lineHeight: 24,
     textAlign: 'center',
+  },
+  errorContent: {
+    marginTop: 15,
+    alignItems: 'center'
+  },
+  errorContentText: {
+    color: 'red',
+    fontSize: 14
   },
   mainContent: {
     marginTop: 15,

@@ -43,9 +43,12 @@ class Tupelo {
     return tupelo.connect(this.TUPELO_HOST, creds);
   }
 
+  stampsToArray(stamps) {
+    return stamps.split(',,').map(stamp => stamp.replace(this.NOTE_SEPARATOR + 'undefined', '')).filter(stamp => stamp);
+  }
+
   async register(creds) {
     const client = this.connect(creds);
-
     await client.register();
     const {keyAddr,} = await client.generateKey();
     const {chainId,} = await client.createChainTree(keyAddr);
@@ -53,40 +56,41 @@ class Tupelo {
     this.writeIdentifierFile(obj);
   }
 
-  async stamp(creds, notes) {
-    if (!dataFileExists()) {
+  async stamp(creds, notes, threshold) {
+    if (!this.dataFileExists()) {
       console.error('Error: you must register before you can record stamps.');
       process.exit(1);
     }
 
-    const identifiers = readIdentifierFile();
-    const client = connect(creds);
-
-    const time = currentTime();
-    const entry = time + NOTE_SEPARATOR + notes;
-
-    const {data,} = await client.resolveData(identifiers.chainId, CHAIN_TREE_STAMP_PATH);
+    const identifiers = this.readIdentifierFile();
+    const client = this.connect(creds);
+    const time = this.currentTime();
+    const entry = time + this.NOTE_SEPARATOR + notes;
+    const {data,} = await client.resolveData(identifiers.chainId, this.CHAIN_TREE_STAMP_PATH);
     let stamps;
+
     if (data) {
-      stamps = data + STAMP_SEPARATOR + entry;
+      stamps = data + this.STAMP_SEPARATOR + entry;
     } else {
       stamps = entry;
     }
 
-    await client.setData(identifiers.chainId, identifiers.keyAddr, CHAIN_TREE_STAMP_PATH, stamps);
+    await client.setData(identifiers.chainId, identifiers.keyAddr, this.CHAIN_TREE_STAMP_PATH, stamps);
+
+    return this.stampsToArray(stamps);
   }
 
   async printTally(creds) {
-    if (!dataFileExists()) {
+    if (!this.dataFileExists()) {
       console.error('Error: you must register before you can print stamp tallies.');
       process.exit(1);
     }
 
-    const identifiers = readIdentifierFile();
-    const client = connect(creds);
-
-    const {data,} = await client.resolveData(identifiers.chainId, CHAIN_TREE_STAMP_PATH);
+    const identifiers = this.readIdentifierFile();
+    const client = this.connect(creds);
+    const {data,} = await client.resolveData(identifiers.chainId, this.CHAIN_TREE_STAMP_PATH);
     const tally = data[0];
+
     if (tally) {
       console.log('----Timestamps----');
       console.log(tally.replace(new RegExp(STAMP_SEPARATOR, 'g'), '\n'));

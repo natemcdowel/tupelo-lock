@@ -2,10 +2,17 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const Tupelo = require('./tupelo');
 const ZwaveLock = require('./zwave');
+const lockoutTime = 3600;
+const port = 3000;
 const creds = {
   walletName: 'wallet_name',
   passPhrase: 'wallet_password'
 };
+const zwaveDevice = {
+  nodeId: 3,
+  class: 98,
+  index: 0
+}
 
 class TupeloServer {
 
@@ -26,51 +33,97 @@ class TupeloServer {
   }
 
   listen() {
-    this.app.listen(3000, () => console.log('Tupelo server running on port ' + 3000 + '..'));
+    this.app.listen(port, () => console.log('Tupelo server running on port ' + port + '..'));
   }
 
   handleRequests() {
+    this.listenForStatus();
+    this.listenForRegister();
+    this.listenForStamp();
+    this.listenForTally();
+  }
 
+  isFirstStamp(stamps) {
+    return !!(stamps.length === 1);
+  }
+
+  stampIsValid(stamps) {
+    return !!(
+      stamps.length > 1 &&
+      Date.now() < (stamps[0] + lockoutTime)
+    )
+  }
+
+  listenForStatus() {
     this.app.get('/status', (req, res) => {
+
       this.setLockStatus();
       this.success(res, {locked: this.lockStatus});
-    });
 
+    });
+  }
+
+  listenForRegister() {
     this.app.get('/register', (req, res) => {
       this.tupelo.register(creds).then(
+  
         success => this.success(res, {registered: success}),
-        error => this.error(res, {error: error})
+        error => {
+          console.log(error);
+          this.error(res, {error: error})
+        }
+
       );
     });
+  }
 
+  listenForStamp() {
     this.app.get('/stamp', (req, res) => {
-      // this.tupelo.stamp(creds).then(
-      //   success => {
-      //     console.log(success);
-      let sent = false;
-      this.toggleLock();
-      this.zwave.controller.on('value changed', (nodeid, comclass, value) => {
-        if (!sent) {
-          sent = true;
-          this.setLockStatus();
-          this.success(res, {locked: this.lockStatus});
-        }
-      });
-      //   },
-      //   error => this.error(res, command)
-      // );
-    });
+      this.tupelo.stamp(creds).then(
 
+        stamps => {
+          if (this.isFirstStamp(stamps) || this.stampIsValid(stamps)) {
+            this.changeLock(res);
+          } else {
+            this.error(res, {error: 'Your session time has expired'})
+          }
+        },
+        error => {
+          console.log(error);
+          this.error(res, {error: 'Could not change lock'});
+        }
+
+      );
+    });
+  }
+
+  listenForTally() {
     this.app.get('/tally', (req, res) => {
       this.tupelo.printTally(creds).then(
+
         success => this.success(res, {tallies: success}),
         error => this.error(res, {error: error})
+
       );
+    });
+  }
+
+  changeLock(res) {
+    let sent = false;
+    this.toggleLock();
+    this.zwave.controller.on('value changed', () => {
+      if (!sent) {
+
+        sent = true;
+        this.setLockStatus();
+        this.success(res, {locked: this.lockStatus});
+
+      }
     });
   }
 
   setLockStatus() {
-    this.lockStatus = this.findLock().classes['98']['0'].value;
+    this.lockStatus = this.findLock().classes[zwaveDevice.class][zwaveDevice.index].value;
   }
 
   findLock() {
@@ -78,13 +131,23 @@ class TupeloServer {
   }
 
   toggleLock() {
-    return this.zwave.controller.setValue(3, 98, 1, 0, this.lockStatus ? false : true);
+    return this.zwave.controller.setValue(
+      zwaveDevice.nodeId,
+      zwaveDevice.class,
+      1,
+      zwaveDevice.index,
+      this.lockStatus ? false : true
+    );
   }
 
   success(res, message) {
     return res.status(200).send(message);
   }
+
+  error(res, message) {
+    return res.status(400).send(message);
+  }
 }
 
-let server = new TupeloServer
+let server = new TupeloServer();
 server.start();
