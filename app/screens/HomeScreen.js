@@ -1,15 +1,13 @@
 import React from 'react';
 import {
   Image,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
+  ActivityIndicator,
   View
 } from 'react-native';
-import { WebBrowser } from 'expo';
-import { MonoText } from '../components/StyledText';
 import Endpoints from '../constants/Endpoints';
 
 export default class HomeScreen extends React.Component {
@@ -17,7 +15,24 @@ export default class HomeScreen extends React.Component {
     header: null,
   };
 
+  state = {
+    locked: 'unlocked',
+    loading: true
+  };
+
+  constructor(props) {
+    super(props);
+    this._fetchLockStatus();
+  }
+
   render() {
+
+    let mainContent = this._showButton();
+
+    if (this.state.loading) {
+      mainContent = this._showLoader();
+    }
+
     return (
       <View style={styles.container}>
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -33,41 +48,44 @@ export default class HomeScreen extends React.Component {
           </View>
 
           <View style={styles.getStartedContainer}>
-
             <Text style={styles.getStartedText}>Tupelo Lock Access</Text>
-
           </View>
-
-          <View style={styles.helpContainer}>
-            <TouchableOpacity onPress={this._lock} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>Lock</Text>
-            </TouchableOpacity>
+          
+          <View style={styles.mainContent}>
+            {mainContent}
           </View>
         </ScrollView>
 
-        <View style={styles.tabBarInfoContainer}>
-          <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-
-          <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-            <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
-          </View>
-        </View>
       </View>
     );
   }
 
-  _lock = () => {
+  _showLoader = () => {
+    return <ActivityIndicator size="large" color="#0000ff" />
+  }
+
+  _showButton = () => {
+    return <View style={styles.mainContent}>
+      <TouchableOpacity onPress={this._toggleLock} style={styles.mainContentLink}>
+        <Text style={styles.mainContentLinkText}>{this.state.locked}</Text>
+      </TouchableOpacity>
+    </View>
+  }
+
+  _toggleLock = () => {
+    this.setState({ loading: true});
     fetch(Endpoints.tupelo + '/stamp').then(data => {
-      console.log(data);
+      this._fetchLockStatus();
     });
-    // const lock = lockCall.json();
-    // console.log(lockCall);
   };
 
-  _getLockStatus = () => {
-    fetch(Endpoints.tupelo + '/status').then(data => {
-      console.log(data);
-    });
+  _fetchLockStatus = () => {
+    fetch(Endpoints.tupelo + '/status')
+      .then(res => res.json())
+      .then(res => {
+        this.setState({ locked: res.locked ? 'Unlock' : 'Lock' });
+        this.setState({ loading: false});
+      });
   }
 }
 
@@ -75,13 +93,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
   },
   contentContainer: {
     paddingTop: 30,
@@ -102,59 +113,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 50,
   },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
-  },
-  codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
   getStartedText: {
     fontSize: 17,
     color: 'rgba(96,100,109, 1)',
     lineHeight: 24,
     textAlign: 'center',
   },
-  tabBarInfoContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  navigationFilename: {
-    marginTop: 5,
-  },
-  helpContainer: {
+  mainContent: {
     marginTop: 15,
     alignItems: 'center',
   },
-  helpLink: {
+  mainContentLink: {
     paddingVertical: 15,
   },
-  helpLinkText: {
+  mainContentLinkText: {
     fontSize: 14,
     color: '#2e78b7',
   },

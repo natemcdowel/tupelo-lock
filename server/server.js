@@ -7,17 +7,17 @@ const creds = {
   passPhrase: 'wallet_password'
 };
 
-let command = '';
-
 class TupeloServer {
 
   constructor() {
+    this.lockStatus = false;
     this.app = express();
     this.app.use( bodyParser.json() );
     this.app.use( bodyParser.urlencoded({extended: true}) ); 
     this.tupelo = new Tupelo();
     this.zwave = new ZwaveLock();
     this.zwave.connect();
+    this.zwave.listenForEvents();
   }
 
   start() {
@@ -32,48 +32,57 @@ class TupeloServer {
   handleRequests() {
 
     this.app.get('/status', (req, res) => {
-
-      command = 'Status';
-      this.zwave.register(creds).then(
-        success => this.success(res, command),
-        error => this.error(res, command)
-      );
-
+      this.setLockStatus();
+      this.success(res, {locked: this.lockStatus});
     });
 
     this.app.get('/register', (req, res) => {
-
-      command = 'Registration';
       this.tupelo.register(creds).then(
-        success => this.success(res, command),
-        error => this.error(res, command)
+        success => this.success(res, {registered: success}),
+        error => this.error(res, {error: error})
       );
-
     });
 
     this.app.get('/stamp', (req, res) => {
-
-      command = 'Stamped';
-      this.tupelo.stamp(creds).then(
-        success => this.success(res, command),
-        error => this.error(res, command)
-      );
-
+      // this.tupelo.stamp(creds).then(
+      //   success => {
+      //     console.log(success);
+      let sent = false;
+      this.toggleLock();
+      this.zwave.controller.on('value changed', (nodeid, comclass, value) => {
+        if (!sent) {
+          sent = true;
+          this.setLockStatus();
+          this.success(res, {locked: this.lockStatus});
+        }
+      });
+      //   },
+      //   error => this.error(res, command)
+      // );
     });
 
     this.app.get('/tally', (req, res) => {
-
-      command = 'Tally';
       this.tupelo.printTally(creds).then(
-        success => this.success(res, command),
-        error => this.error(res, command)
+        success => this.success(res, {tallies: success}),
+        error => this.error(res, {error: error})
       );
-
     });
   }
 
+  setLockStatus() {
+    this.lockStatus = this.findLock().classes['98']['0'].value;
+  }
+
+  findLock() {
+    return this.zwave.nodes.find(node => node && node.type && node.type.indexOf('Lock') > -1);
+  }
+
+  toggleLock() {
+    return this.zwave.controller.setValue(3, 98, 1, 0, this.lockStatus ? false : true);
+  }
+
   success(res, message) {
-    return res.status(200).send({success: message});
+    return res.status(200).send(message);
   }
 }
 
