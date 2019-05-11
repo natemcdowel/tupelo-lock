@@ -59,6 +59,8 @@ class TupeloServer {
 
   listenForRegister() {
     this.app.get('/register', (req, res) => {
+      
+      console.log(req.query);
       this.tupelo.register(creds).then(
   
         success => this.success(res, {registered: success}),

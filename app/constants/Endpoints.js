@@ -1,3 +1,3 @@
 export default {
-  tupelo: 'http://10.0.0.240:3000'
+  tupelo: 'http://10.0.0.212:3000'
 };

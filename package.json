@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "openzwave-shared": "latest",
+    "simple-react-form": "^2.2.1",
     "tupelo-client": "^0.1.1"
   },
   "devDependencies": {

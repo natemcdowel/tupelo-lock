@@ -1,5 +1,6 @@
 {
-  "tupelo_host": "localhost:50051",
+  "tupelo_host": "10.0.0.212:50051",
+  "pi_host": "10.0.0.212/",
   "server_port": "3000",
   "lockout_time": "3600",
   "creds": {
