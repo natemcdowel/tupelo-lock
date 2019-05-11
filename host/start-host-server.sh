@@ -1,5 +1,7 @@
 #!/bin/bash
 
-./tupelo-v0.2.0-linux-arm-7 rpc-server
+node node_modules/react-scripts/scripts/start.js
 node ../server/server.js
-react-scripts start
+./tupelo-v0.2.0-linux-arm-7 rpc-server
+
+
