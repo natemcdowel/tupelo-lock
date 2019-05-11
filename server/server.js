@@ -2,11 +2,13 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const Tupelo = require('./tupelo');
 const ZwaveLock = require('./zwave');
+const Mailer = require('./mailer');
 const config = require('./config.json');
 const lockoutTime = config.lockout_time;
 const port = config.server_port;
 const creds = config.creds;
 const zwaveDevice = config.zwave_device;
+const nodemailer = require('nodemailer');
 
 class TupeloServer {
 
@@ -17,6 +19,7 @@ class TupeloServer {
     this.app.use( bodyParser.urlencoded({extended: true}) );
     this.tupelo = new Tupelo();
     this.zwave = new ZwaveLock();
+    this.mailer = new Mailer();
     this.zwave.connect();
     this.zwave.listenForEvents();
   }
@@ -65,13 +68,14 @@ class TupeloServer {
   listenForRegister() {
     this.app.get('/register', (req, res) => {
       
-      if (req.query && req.query.email) {
-        creds.walletName = req.query.email;
-      }
+      creds.walletName = req.query.email;
 
       this.tupelo.register(creds).then(
   
-        success => this.success(res, {registered: success}),
+        success => {
+          this.mailer.sendMail(req.query.email);
+          this.success(res, {registered: success});
+        },
         error => {
           console.log(error);
           this.error(res, {error: error})

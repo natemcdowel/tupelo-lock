@@ -31,10 +31,11 @@ export default class Form extends React.Component {
     fetch( this.endpoint + this.state.email)
       .then(response => response.json())
       .then(result => {
-        this.setState({message: 'Email registered! Notifying guest of access.'});
-      })
-      .catch(e => {
-        this.setState({message: 'There was an error registering the guest.'});
+        if (result.error) {
+          this.setState({message: result.error.details});
+        } else {
+          this.setState({message: 'Email registered! Notifying guest of access.'});
+        }
       });
   } 
 

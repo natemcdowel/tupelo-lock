@@ -6,7 +6,7 @@ const config = require('./config.json');
 class Tupelo {
 
   constructor() {
-    this.localIdentifierPath = './.timestamper-identifiers';
+    this.localIdentifierPath = './validKeys.json';
     this.TUPELO_HOST = config.tupelo_host;
     this.CHAIN_TREE_STAMP_PATH = 'timestamper/stamps';
     this.STAMP_SEPARATOR = ',,';
@@ -27,8 +27,16 @@ class Tupelo {
   };
 
   writeIdentifierFile(configObj) {
-    const data = JSON.stringify(configObj);
-    fs.writeFileSync(this.localIdentifierPath, data);
+    let validKeys = [];
+
+    try {
+      validKeys = require(this.localIdentifierPath);
+      validKeys.push(configObj);
+      fs.writeFileSync(this.localIdentifierPath, JSON.stringify(validKeys, 2));
+    } catch(error) {
+      validKeys.push(configObj);
+      fs.writeFileSync(this.localIdentifierPath, JSON.stringify(validKeys, 2));
+    }
   }
 
   readIdentifierFile() {
