@@ -31,8 +31,8 @@ class ZwaveLock {
       console.log('scanning homeid=0x%s...', this.homeid.toString(16));
     });
     
-    this.controller.on('driver failed', () => {
-      console.log('failed to start driver');
+    this.controller.on('driver failed', error => {
+      console.log('driver failed');
       this.controller.disconnect();
       process.exit();
     });
