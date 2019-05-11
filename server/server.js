@@ -14,7 +14,7 @@ class TupeloServer {
     this.lockStatus = false;
     this.app = express();
     this.app.use( bodyParser.json() );
-    this.app.use( bodyParser.urlencoded({extended: true}) ); 
+    this.app.use( bodyParser.urlencoded({extended: true}) );
     this.tupelo = new Tupelo();
     this.zwave = new ZwaveLock();
     this.zwave.connect();
@@ -28,6 +28,11 @@ class TupeloServer {
 
   listen() {
     this.app.listen(port, () => console.log('Tupelo server running on port ' + port + '..'));
+    this.app.use((req, res, next) => {
+      res.header("Access-Control-Allow-Origin", "*");
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      next();
+    });
   }
 
   handleRequests() {
@@ -60,7 +65,10 @@ class TupeloServer {
   listenForRegister() {
     this.app.get('/register', (req, res) => {
       
-      console.log(req.query);
+      if (req.query && req.query.email) {
+        creds.walletName = req.query.email;
+      }
+
       this.tupelo.register(creds).then(
   
         success => this.success(res, {registered: success}),
@@ -137,6 +145,7 @@ class TupeloServer {
   }
 
   success(res, message) {
+    console.log(message);
     return res.status(200).send(message);
   }
 

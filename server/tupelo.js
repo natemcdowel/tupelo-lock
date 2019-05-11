@@ -55,6 +55,7 @@ class Tupelo {
     const {chainId,} = await client.createChainTree(keyAddr);
     const obj = this.identifierObj(keyAddr, chainId);
     this.writeIdentifierFile(obj);
+    return obj;
   }
 
   async stamp(creds, notes) {

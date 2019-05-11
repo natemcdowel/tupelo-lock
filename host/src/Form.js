@@ -1,9 +1,10 @@
 import React from "react";;
 
 export default class Form extends React.Component {
+  endpoint = 'http://10.0.0.240:2000/register?email=';
   state = {
     email: "",
-
+    message: ""
   };
 
   change = e => {
@@ -27,10 +28,13 @@ export default class Form extends React.Component {
   };
 
   generateToken = () => {
-    fetch('http://10.0.0.212:3000/register')
+    fetch( this.endpoint + this.state.email)
       .then(response => response.json())
-      .then(data => {
-        console.log(data);
+      .then(result => {
+        this.setState({message: 'Email registered! Notifying guest of access.'});
+      })
+      .catch(e => {
+        this.setState({message: 'There was an error registering the guest.'});
       });
   } 
 
@@ -38,12 +42,15 @@ export default class Form extends React.Component {
   render() {
     return (
       <form>
+        <br />
         <input
           name="email"
           placeholder="Email"
           value={this.state.email}
           onChange={e => this.change(e)}
         />
+        <br /><br />
+        <span>{this.state.message}</span>
         <br /><br />
         <button onClick={e => this.onSubmit(e)}>Generate token</button>
       </form>
