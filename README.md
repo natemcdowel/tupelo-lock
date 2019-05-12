@@ -15,12 +15,22 @@
 
 ## Running the server
 
-- Run Tupelo `docker run -p 50051:50051 quorumcontrol/tupelo:v0.1.1 rpc-server -l 3`
 - Run the Tupelo-Zwave server `node server/server.js`
 
-## Running the app
+## Running the host app (Raspberry Pi)
 
-- Run `cd app`
+- Run `cd host-app`
+- Run `npm install`
+- Run `npm start` to start the Tupelo Pi executable, Node server and host app
+- Go to `http://localhost:3000` to run the host app.
+- Submitting an email will create a new ChainTree stored on Tupelo and the validKeys.json file
+- An email containing a userId code will be sent to your guest.
+
+## Running the guest app (React-Native Android or IOS)
+
+- Run `cd guest-app`
 - Run `npm install`
 - Run `npm start` to start the app.
 - Select Android or iPhone emulation mode
+- Enter a valid userId code to gain access to the host's lock
+- Click lock or unlock for access to the host's home

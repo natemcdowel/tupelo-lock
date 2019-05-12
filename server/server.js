@@ -86,7 +86,6 @@ class TupeloServer {
           this.success(res, {registered: success});
         },
         error => {
-          console.log(error);
           this.error(res, {error: error})
         }
 
@@ -99,7 +98,6 @@ class TupeloServer {
       this.tupelo.stamp(creds).then(
 
         stamps => {
-          console.log(stamps);
           if (this.isFirstStamp(stamps) || this.stampIsValid(stamps)) {
             this.changeLock(res);
           } else {
@@ -158,7 +156,6 @@ class TupeloServer {
   }
 
   success(res, message) {
-    console.log(message);
     return res.status(200).send(message);
   }
 
