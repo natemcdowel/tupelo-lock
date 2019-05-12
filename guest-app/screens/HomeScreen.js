@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Image,
   ScrollView,
-  StyleSheet,
   Text,
   ActivityIndicator,
   View,
@@ -10,6 +9,7 @@ import {
   TextInput
 } from 'react-native';
 import Endpoints from '../constants/Endpoints';
+import { styles } from './HomeScreenStyles.js'
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -32,9 +32,9 @@ export default class HomeScreen extends React.Component {
 
   render() {
 
-    let mainContent = null;
-    let codeInput = this._showCodeInput();
-    let codeButton = this._showCodeButton();
+    let mainContent = null,
+      codeInput = this._showCodeInput(),
+      codeButton = this._showCodeButton();
 
     if (this.state.loading) {
       mainContent = this._showLoader();
@@ -61,7 +61,7 @@ export default class HomeScreen extends React.Component {
           </View>
 
           <View style={styles.getStartedContainer}>
-            <Text style={styles.getStartedText}>Tupelo Lock Access</Text>
+            <Text style={styles.getStartedText}>Tupelo Guest Lock Access</Text>
           </View>
           
           <View style={styles.mainContent}>
@@ -137,13 +137,9 @@ export default class HomeScreen extends React.Component {
   _toggleLock = () => {
     this.setState({ loading: true});
     fetch(Endpoints.tupelo + '/stamp').then(data => {
-
       this._fetchLockStatus();
-
     }, () => {
-      
       this._setError('There was an error communicating with your lock');
-
     });
   };
 
@@ -151,65 +147,10 @@ export default class HomeScreen extends React.Component {
     fetch(Endpoints.tupelo + '/status')
       .then(res => res.json())
       .then(res => {
-
         this.setState({ locked: res.locked ? 'Unlock' : 'Lock' });
         this.setState({ loading: false });
-
       }, () => {
-
         this._setError('There was an error communicating with your lock');
-
       });
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  contentContainer: {
-    paddingTop: 30,
-  },
-  welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
-  },
-  getStartedContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50,
-  },
-  getStartedText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-  errorContent: {
-    marginTop: 15,
-    alignItems: 'center'
-  },
-  errorContentText: {
-    color: 'red',
-    fontSize: 14
-  },
-  mainContent: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  mainContentLink: {
-    paddingVertical: 15,
-  },
-  mainContentLinkText: {
-    fontSize: 14,
-    color: '#2e78b7',
-  },
-});

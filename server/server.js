@@ -14,14 +14,18 @@ class TupeloServer {
 
   constructor() {
     this.lockStatus = false;
-    this.app = express();
-    this.app.use( bodyParser.json() );
-    this.app.use( bodyParser.urlencoded({extended: true}) );
+    this.setupExpress();
     this.tupelo = new Tupelo();
     this.zwave = new ZwaveLock();
     this.mailer = new Mailer();
     this.zwave.connect();
     this.zwave.listenForEvents();
+  }
+
+  setupExpress() {
+    this.app = express();
+    this.app.use( bodyParser.json() );
+    this.app.use( bodyParser.urlencoded({extended: true}) );
   }
 
   start() {
@@ -59,28 +63,21 @@ class TupeloServer {
 
   listenForAccess() {
     this.app.get('/access', (req, res) => {
-
       this.success(res, {authorized: this.tupelo.checkForAccess(req.query.code)});
-
     });
   }
 
   listenForStatus() {
     this.app.get('/status', (req, res) => {
-
       this.setLockStatus();
       this.success(res, {locked: this.lockStatus});
-
     });
   }
 
   listenForRegister() {
     this.app.get('/register', (req, res) => {
-      
       creds.walletName = req.query.email;
-
       this.tupelo.register(creds).then(
-  
         success => {
           this.mailer.sendMail(req.query.email, success.userId);
           this.success(res, {registered: success});
@@ -88,7 +85,6 @@ class TupeloServer {
         error => {
           this.error(res, {error: error})
         }
-
       );
     });
   }
@@ -96,7 +92,6 @@ class TupeloServer {
   listenForStamp() {
     this.app.get('/stamp', (req, res) => {
       this.tupelo.stamp(creds).then(
-
         stamps => {
           if (this.isFirstStamp(stamps) || this.stampIsValid(stamps)) {
             this.changeLock(res);
@@ -107,7 +102,6 @@ class TupeloServer {
         error => {
           this.error(res, {error: 'Could not change lock'});
         }
-
       );
     });
   }
@@ -115,10 +109,8 @@ class TupeloServer {
   listenForTally() {
     this.app.get('/tally', (req, res) => {
       this.tupelo.printTally(creds).then(
-
         success => this.success(res, {tallies: success}),
         error => this.error(res, {error: error})
-
       );
     });
   }
@@ -128,11 +120,9 @@ class TupeloServer {
     this.toggleLock();
     this.zwave.controller.on('value changed', () => {
       if (!sent) {
-
         sent = true;
         this.setLockStatus();
         this.success(res, {locked: this.lockStatus});
-
       }
     });
   }

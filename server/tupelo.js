@@ -17,6 +17,7 @@ class Tupelo {
     assert.notEqual(keyAddr, null);
     assert.notEqual(chainId, null);
     const userId = this.makeUserId(6);
+
     return {
       keyAddr,
       chainId,
@@ -76,7 +77,7 @@ class Tupelo {
     for ( let i = 0; i < length; i++ ) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-    return result;
+    return result.toUpperCase();
   }
 
   async register(creds) {
