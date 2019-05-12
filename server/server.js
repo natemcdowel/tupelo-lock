@@ -39,6 +39,7 @@ class TupeloServer {
   }
 
   handleRequests() {
+    this.listenForAccess();
     this.listenForStatus();
     this.listenForRegister();
     this.listenForStamp();
@@ -54,6 +55,14 @@ class TupeloServer {
       stamps.length > 1 &&
       Date.now() < (stamps[0] + lockoutTime)
     )
+  }
+
+  listenForAccess() {
+    this.app.get('/access', (req, res) => {
+
+      this.success(res, {authorized: this.tupelo.checkForAccess(req.query.code)});
+
+    });
   }
 
   listenForStatus() {

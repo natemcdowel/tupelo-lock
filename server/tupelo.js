@@ -56,6 +56,15 @@ class Tupelo {
     return tupelo.connect(this.TUPELO_HOST, creds);
   }
 
+  checkForAccess(code) {
+    try {
+      const validKeys = require('.' + this.localIdentifierPath);
+      return !!(validKeys.find(keys => keys.userId === code));
+    } catch(error) {
+      return false;
+    }
+  }
+
   stampsToArray(stamps) {
     return stamps.split(',,').map(stamp => stamp.replace(this.NOTE_SEPARATOR + 'undefined', '')).filter(stamp => stamp);
   }
