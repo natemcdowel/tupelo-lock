@@ -73,7 +73,7 @@ class TupeloServer {
       this.tupelo.register(creds).then(
   
         success => {
-          this.mailer.sendMail(req.query.email);
+          this.mailer.sendMail(req.query.email, success.userId);
           this.success(res, {registered: success});
         },
         error => {

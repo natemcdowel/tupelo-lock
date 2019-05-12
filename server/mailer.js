@@ -5,6 +5,7 @@ const transporter = nodemailer.createTransport(config.email);
 class Mailer {
 
   sendMail(emailTo, code) {
+
     const mailOptions = {
       from: config.email.auth.user,
       to: emailTo,
