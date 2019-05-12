@@ -16,9 +16,11 @@ class Tupelo {
   identifierObj(keyAddr, chainId) {
     assert.notEqual(keyAddr, null);
     assert.notEqual(chainId, null);
+    const userId = this.makeUserId(6);
     return {
       keyAddr,
       chainId,
+      userId
     };
   }
 
@@ -26,16 +28,18 @@ class Tupelo {
     return fs.existsSync(this.localIdentifierPath);
   };
 
-  writeIdentifierFile(configObj) {
-    let validKeys = [];
+  writeValidKeys(validKeys, configObj) {
+    validKeys.push(configObj);
+    fs.writeFileSync(this.localIdentifierPath, JSON.stringify(validKeys, 2));
+  }
 
+  writeIdentifierFile(configObj) {
     try {
-      validKeys = require(this.localIdentifierPath);
-      validKeys.push(configObj);
-      fs.writeFileSync(this.localIdentifierPath, JSON.stringify(validKeys, 2));
+      let validKeys = require('.' + this.localIdentifierPath);
+      this.writeValidKeys(validKeys, configObj);
     } catch(error) {
-      validKeys.push(configObj);
-      fs.writeFileSync(this.localIdentifierPath, JSON.stringify(validKeys, 2));
+      let validKeys = [];
+      this.writeValidKeys(validKeys, configObj);
     }
   }
 
@@ -54,6 +58,16 @@ class Tupelo {
 
   stampsToArray(stamps) {
     return stamps.split(',,').map(stamp => stamp.replace(this.NOTE_SEPARATOR + 'undefined', '')).filter(stamp => stamp);
+  }
+
+  makeUserId(length) {
+    let result = '';
+    let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let charactersLength = characters.length;
+    for ( let i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
   }
 
   async register(creds) {

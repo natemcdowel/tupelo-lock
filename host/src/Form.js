@@ -16,7 +16,6 @@ export default class Form extends React.Component {
 
   onSubmit = e => {
     e.preventDefault();
-    // this.props.onSubmit(this.state);
     this.setState({
       email: "",
     });
@@ -39,10 +38,11 @@ export default class Form extends React.Component {
       });
   } 
 
-
   render() {
     return (
       <form>
+        <br />
+        <h3>Tupelo Zwave Host Access</h3>
         <br />
         <input
           name="email"
