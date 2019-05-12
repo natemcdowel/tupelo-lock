@@ -13,6 +13,10 @@
 - Run `zwave.addDevice(true);`
 - Your Zwave device should now be paired
 
+## Server Configuration
+
+- https://github.com/natemcdowel/tupelo-zwave/blob/master/server/config.json
+
 ## Running the server
 
 - Run the Tupelo-Zwave server `node server/server.js`
